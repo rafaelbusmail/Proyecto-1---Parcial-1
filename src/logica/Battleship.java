@@ -1,4 +1,3 @@
-
 package logica;
 
 import model.Player;
@@ -7,18 +6,12 @@ import java.util.Random;
 
 public class Battleship {
     
-    // ═══════════════════════════════════════════════════════════
-    //                    GESTIÓN DE JUGADORES
-    // ═══════════════════════════════════════════════════════════
-    
     private static ArrayList<Player> jugadores = new ArrayList<>();
     private static Player usuarioActual = null;
     
-    // Configuración
-    private static String dificultad = "NORMAL"; 
-    private static String modoJuego = "TUTORIAL"; 
+    private static String dificultad = "NORMAL";
+    private static String modoJuego = "TUTORIAL";
     
-    // Variables del juego actual
     private static String[][] tableroJugador1;
     private static String[][] tableroJugador2;
     private static Player jugador1;
@@ -26,20 +19,14 @@ public class Battleship {
     private static int barcosRestantesJ1;
     private static int barcosRestantesJ2;
     
-    // ═══════════════════════════════════════════════════════════
-    //                    AUTENTICACIÓN DE USUARIOS
-    // ═══════════════════════════════════════════════════════════
-    
     public static boolean registrarJugador(String username, String password) {
-        // Validar que el username sea único
         if (buscarJugadorPorUsername(username) != null) {
-            return false; // Username ya existe
+            return false;
         }
         
-        // Crear nuevo jugador
         Player nuevoJugador = new Player(username, password);
         jugadores.add(nuevoJugador);
-        usuarioActual = nuevoJugador; // Auto-login después del registro
+        usuarioActual = nuevoJugador;
         
         return true;
     }
@@ -76,14 +63,9 @@ public class Battleship {
         return null;
     }
     
-    // ═══════════════════════════════════════════════════════════
-    //                    PERFIL DE JUGADOR
-    // ═══════════════════════════════════════════════════════════
-    
     public static boolean actualizarUsername(String nuevoUsername) {
         if (usuarioActual == null) return false;
         
-        // Verificar que el nuevo username sea único
         if (buscarJugadorPorUsername(nuevoUsername) != null) {
             return false;
         }
@@ -105,10 +87,6 @@ public class Battleship {
         usuarioActual = null;
         return true;
     }
-    
-    // ═══════════════════════════════════════════════════════════
-    //                    CONFIGURACIÓN
-    // ═══════════════════════════════════════════════════════════
     
     public static void setDificultad(String dificultad) {
         Battleship.dificultad = dificultad;
@@ -132,15 +110,9 @@ public class Battleship {
         return modoJuego;
     }
     
-    // ═══════════════════════════════════════════════════════════
-    //                    REPORTES
-    // ═══════════════════════════════════════════════════════════
-    
     public static String obtenerRankingJugadores() {
-        // Ordenar jugadores por puntos (descendente)
         ArrayList<Player> jugadoresOrdenados = new ArrayList<>(jugadores);
         
-        // Bubble sort 
         for (int i = 0; i < jugadoresOrdenados.size() - 1; i++) {
             for (int j = 0; j < jugadoresOrdenados.size() - i - 1; j++) {
                 if (jugadoresOrdenados.get(j).getPuntos() < jugadoresOrdenados.get(j + 1).getPuntos()) {
@@ -151,7 +123,6 @@ public class Battleship {
             }
         }
         
-        // Construir string de ranking
         StringBuilder sb = new StringBuilder();
         sb.append("═══════════════════════════════════════════════\n");
         sb.append("            RANKING DE JUGADORES\n");
@@ -167,10 +138,6 @@ public class Battleship {
         return sb.toString();
     }
     
-    // ═══════════════════════════════════════════════════════════
-    //                    LÓGICA DEL JUEGO
-    // ═══════════════════════════════════════════════════════════
-    
     public static void inicializarJuego(Player j1, Player j2) {
         jugador1 = j1;
         jugador2 = j2;
@@ -178,7 +145,6 @@ public class Battleship {
         tableroJugador1 = new String[8][8];
         tableroJugador2 = new String[8][8];
         
-      //tableros con agua (~)
         for (String[] fila : tableroJugador1) {
             for (int j = 0; j < fila.length; j++) {
                 fila[j] = "~";
@@ -209,12 +175,10 @@ public class Battleship {
         int limiteColumna = horizontal ? columna + tamanio : columna + 1;
         int limiteFila = horizontal ? fila + 1 : fila + tamanio;
         
-        // Validar que el barco cabe en el tablero
         if (limiteColumna > 8 || limiteFila > 8) {
             return false;
         }
         
-        // Validar que no hays otro barco en esas posiciones
         if (horizontal) {
             for (int i = 0; i < tamanio; i++) {
                 if (!tablero[fila][columna + i].equals("~")) {
@@ -229,7 +193,6 @@ public class Battleship {
             }
         }
         
-        // Colocar el barco
         if (horizontal) {
             for (int i = 0; i < tamanio; i++) {
                 tablero[fila][columna + i] = codigoBarco;
@@ -250,7 +213,6 @@ public class Battleship {
                codigo.equals("DT") ? 2 : 0;
     }
     
-    //Regenerar después de CADA impacto
     public static String bombardear(String[][] tablero, int fila, int columna) {
         String celda = tablero[fila][columna];
         
@@ -265,10 +227,12 @@ public class Battleship {
             
             boolean hundido = barcoHundido(tablero, codigoBarco);
             
-            // "luego de que un barco es bombardeado, el tablero se REGENERA"
-            regenerarTablero(tablero);
-            
-            return hundido ? ("HUNDIDO_" + codigoBarco) : ("IMPACTO_" + codigoBarco);
+            if (hundido) {
+                regenerarTablero(tablero);
+                return "HUNDIDO_" + codigoBarco;
+            } else {
+                return "IMPACTO_" + codigoBarco;
+            }
         }
     }
     
@@ -276,15 +240,14 @@ public class Battleship {
         for (String[] fila : tablero) {
             for (String celda : fila) {
                 if (celda.equals(codigoBarco)) {
-                    return false; // partes sin hundir
+                    return false;
                 }
             }
         }
-        return true; // Todo el barco está hundido
+        return true;
     }
     
     public static void regenerarTablero(String[][] tablero) {
-        // Guarda los barcos actuales con sus códigos
         ArrayList<String> barcosEnTablero = new ArrayList<>();
         
         for (String[] fila : tablero) {
@@ -297,14 +260,15 @@ public class Battleship {
             }
         }
         
-        // Limpiar tablero
-        for (String[] fila : tablero) {
-            for (int j = 0; j < fila.length; j++) {
-                fila[j] = "~";
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                String celda = tablero[i][j];
+                if (!celda.equals("F") && !celda.equals("X")) {
+                    tablero[i][j] = "~";
+                }
             }
         }
         
-        // Recoloca barcos aleatoriamente 
         Random random = new Random();
         for (String codigoBarco : barcosEnTablero) {
             boolean colocado = false;
@@ -321,9 +285,7 @@ public class Battleship {
         }
     }
     
-    //Limpiar marcas de fallo 
     public static void limpiarMarcasFallidas(String[][] tablero) {
-        // ✅ USO DE FOREACH
         for (String[] fila : tablero) {
             for (int j = 0; j < fila.length; j++) {
                 if (fila[j].equals("F")) {
@@ -341,7 +303,6 @@ public class Battleship {
     public static int contarBarcosRestantes(String[][] tablero) {
         ArrayList<String> barcosUnicos = new ArrayList<>();
         
-        
         for (String[] fila : tablero) {
             for (String celda : fila) {
                 if (!celda.equals("~") && !celda.equals("F") && !celda.equals("X")) {
@@ -353,24 +314,5 @@ public class Battleship {
         }
         
         return barcosUnicos.size();
-    }
-    
-    // Método de prueba (eliminar en producción)
-    public static void crearJugadoresPrueba() {
-        registrarJugador("admin", "1234");
-        logout();
-        registrarJugador("carlos", "pass");
-        logout();
-        registrarJugador("maria", "pass");
-        logout();
-        
-        //puntos de prueba
-        jugadores.get(0).setPuntos(15);
-        jugadores.get(1).setPuntos(9);
-        jugadores.get(2).setPuntos(6);
-        
-        //logs de prueba
-        jugadores.get(0).agregarLog("admin hundió todos los barcos de carlos en modo NORMAL.");
-        jugadores.get(0).agregarLog("admin hundió todos los barcos de maria en modo EASY.");
     }
 }

@@ -6,7 +6,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 import GUI.PanelJuego;
-import java.io.IOException;  
+import java.io.IOException;
 import java.net.URL;
 
 public class PanelMenuPrincipal extends JPanel {
@@ -86,7 +86,7 @@ public class PanelMenuPrincipal extends JPanel {
         
         lblPuntos = new JLabel();
         lblPuntos.setFont(new Font("Arial", Font.PLAIN, 16));
-        lblPuntos.setForeground(new Color(255, 215, 0)); 
+        lblPuntos.setForeground(new Color(255, 215, 0));
         lblPuntos.setHorizontalAlignment(SwingConstants.CENTER);
         gbcMenu.gridy = 1;
         panelMenu.add(lblPuntos, gbcMenu);
@@ -168,7 +168,7 @@ public class PanelMenuPrincipal extends JPanel {
             JOptionPane.QUESTION_MESSAGE);
         
         if (usernameJ2 == null || usernameJ2.trim().equalsIgnoreCase("EXIT")) {
-            return; 
+            return;
         }
         
         usernameJ2 = usernameJ2.trim();
@@ -218,13 +218,13 @@ public class PanelMenuPrincipal extends JPanel {
             opciones[0]);
         
         switch (seleccion) {
-            case 0: // Cambiar dificultad
+            case 0:
                 cambiarDificultad();
                 break;
-            case 1: // Cambiar modo
+            case 1:
                 cambiarModoJuego();
                 break;
-            case 2: // Volver
+            case 2:
             default:
                 break;
         }
@@ -308,13 +308,13 @@ public class PanelMenuPrincipal extends JPanel {
             opciones[0]);
         
         switch (seleccion) {
-            case 0: // Últimos 10 juegos
+            case 0:
                 mostrarUltimosJuegos();
                 break;
-            case 1: // Ranking
+            case 1:
                 mostrarRanking();
                 break;
-            case 2: // Volver
+            case 2:
             default:
                 break;
         }
@@ -365,16 +365,16 @@ public class PanelMenuPrincipal extends JPanel {
             opciones[0]);
         
         switch (seleccion) {
-            case 0: // Ver datos
+            case 0:
                 verDatos();
                 break;
-            case 1: // Modificar datos
+            case 1:
                 modificarDatos();
                 break;
-            case 2: // Eliminar cuenta
+            case 2:
                 eliminarCuenta();
                 break;
-            case 3: // Volver
+            case 3:
             default:
                 break;
         }
@@ -382,7 +382,7 @@ public class PanelMenuPrincipal extends JPanel {
     
     private void verDatos() {
         model.Player usuario = Battleship.getUsuarioActual();
-    
+        
         String asteriscos = "";
         for (int i = 0; i < usuario.getPassword().length(); i++) {
             asteriscos += "●";
@@ -414,7 +414,7 @@ public class PanelMenuPrincipal extends JPanel {
             opciones[0]);
         
         switch (seleccion) {
-            case 0: // Cambiar username
+            case 0:
                 String nuevoUsername = JOptionPane.showInputDialog(this,
                     "Ingrese el nuevo username:",
                     Battleship.getUsuarioActual().getUsername());
@@ -435,7 +435,7 @@ public class PanelMenuPrincipal extends JPanel {
                 }
                 break;
                 
-            case 1: // Cambiar password
+            case 1:
                 String nuevoPassword = JOptionPane.showInputDialog(this,
                     "Ingrese el nuevo password:");
                 
@@ -453,7 +453,7 @@ public class PanelMenuPrincipal extends JPanel {
                 }
                 break;
                 
-            case 2: // Cancelar
+            case 2:
             default:
                 break;
         }
@@ -469,7 +469,6 @@ public class PanelMenuPrincipal extends JPanel {
             JOptionPane.WARNING_MESSAGE);
         
         if (confirmacion == JOptionPane.YES_OPTION) {
-            // Segunda confirmación
             String username = JOptionPane.showInputDialog(this,
                 "Para confirmar, escriba su username:");
             

@@ -1,16 +1,11 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-    package GUI;
+package GUI;
 
 import logica.Battleship;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
-import java.io.IOException;  
+import java.io.IOException;
 import java.net.URL;
 
 public class PanelRegistro extends JPanel {
@@ -37,21 +32,19 @@ public class PanelRegistro extends JPanel {
     }
     
     private void cargarImagenFondo() {
-    try {
-        
-        
-        URL url = getClass().getResource("/imagenes/fondo_registro.jpg");
-        if (url != null) {
-            imagenFondo = ImageIO.read(url);
-        } else {
-            System.err.println("No se encontró la imagen en: /imagenes/fondo_registro.jpg");
+        try {
+            URL url = getClass().getResource("/imagenes/fondo_registro.jpg");
+            if (url != null) {
+                imagenFondo = ImageIO.read(url);
+            } else {
+                System.err.println("No se encontró la imagen en: /imagenes/fondo_registro.jpg");
+                imagenFondo = null;
+            }
+        } catch (IOException e) {
+            System.err.println("Error al cargar imagen: " + e.getMessage());
             imagenFondo = null;
         }
-    } catch (IOException e) {
-        System.err.println("Error al cargar imagen: " + e.getMessage());
-        imagenFondo = null;
     }
-}
     
     private void configurarPanel() {
         setLayout(new GridBagLayout());
@@ -73,7 +66,6 @@ public class PanelRegistro extends JPanel {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         
-        // Panel semitransparente
         JPanel panelFormulario = new JPanel(new GridBagLayout());
         panelFormulario.setBackground(new Color(0, 0, 0, 180));
         panelFormulario.setBorder(BorderFactory.createEmptyBorder(30, 40, 30, 40));
@@ -83,7 +75,6 @@ public class PanelRegistro extends JPanel {
         gbcForm.fill = GridBagConstraints.HORIZONTAL;
         gbcForm.gridx = 0;
         
-        // Título
         JLabel lblTitulo = new JLabel("🚢 CREAR CUENTA");
         lblTitulo.setFont(new Font("Arial", Font.BOLD, 32));
         lblTitulo.setForeground(Color.WHITE);
@@ -93,7 +84,6 @@ public class PanelRegistro extends JPanel {
         panelFormulario.add(lblTitulo, gbcForm);
         gbcForm.gridwidth = 1;
         
-        // Username
         JLabel lblUsername = new JLabel("Username:");
         lblUsername.setFont(new Font("Arial", Font.BOLD, 14));
         lblUsername.setForeground(Color.WHITE);
@@ -107,7 +97,6 @@ public class PanelRegistro extends JPanel {
         gbcForm.gridy = 1;
         panelFormulario.add(txtUsername, gbcForm);
         
-        // Password
         JLabel lblPassword = new JLabel("Password:");
         lblPassword.setFont(new Font("Arial", Font.BOLD, 14));
         lblPassword.setForeground(Color.WHITE);
@@ -121,7 +110,6 @@ public class PanelRegistro extends JPanel {
         gbcForm.gridy = 2;
         panelFormulario.add(txtPassword, gbcForm);
         
-        // Confirmar password
         JLabel lblConfirmar = new JLabel("Confirmar:");
         lblConfirmar.setFont(new Font("Arial", Font.BOLD, 14));
         lblConfirmar.setForeground(Color.WHITE);
@@ -135,7 +123,6 @@ public class PanelRegistro extends JPanel {
         gbcForm.gridy = 3;
         panelFormulario.add(txtConfirmarPassword, gbcForm);
         
-        // Error label
         lblError = new JLabel(" ");
         lblError.setFont(new Font("Arial", Font.ITALIC, 12));
         lblError.setForeground(new Color(255, 100, 100));
@@ -146,7 +133,6 @@ public class PanelRegistro extends JPanel {
         panelFormulario.add(lblError, gbcForm);
         gbcForm.gridwidth = 1;
         
-        // Register button
         btnRegistrar = crearBoton("Crear Cuenta", new Color(39, 174, 96));
         btnRegistrar.addActionListener(e -> manejarRegistro());
         gbcForm.gridx = 0;
@@ -154,7 +140,6 @@ public class PanelRegistro extends JPanel {
         gbcForm.gridwidth = 2;
         panelFormulario.add(btnRegistrar, gbcForm);
         
-        // Back button
         btnVolver = crearBoton("Volver al Login", new Color(149, 165, 166));
         btnVolver.addActionListener(e -> {
             limpiarCampos();
@@ -163,7 +148,6 @@ public class PanelRegistro extends JPanel {
         gbcForm.gridy = 6;
         panelFormulario.add(btnVolver, gbcForm);
         
-        // Agregar al panel principal
         gbc.gridx = 0;
         gbc.gridy = 0;
         add(panelFormulario, gbc);
@@ -196,7 +180,6 @@ public class PanelRegistro extends JPanel {
         String password = new String(txtPassword.getPassword());
         String confirmar = new String(txtConfirmarPassword.getPassword());
         
-        // Validaciones
         if (username.isEmpty() || password.isEmpty() || confirmar.isEmpty()) {
             mostrarError("Por favor complete todos los campos");
             return;
@@ -217,7 +200,6 @@ public class PanelRegistro extends JPanel {
             return;
         }
         
-        // Intentar registrar
         if (Battleship.registrarJugador(username, password)) {
             JOptionPane.showMessageDialog(this,
                 "¡Cuenta creada exitosamente!\nBienvenido " + username,
@@ -225,7 +207,6 @@ public class PanelRegistro extends JPanel {
                 JOptionPane.INFORMATION_MESSAGE);
             limpiarCampos();
             
-            // Actualizar mensaje de bienvenida
             for (Component comp : panelContenido.getComponents()) {
                 if (comp instanceof PanelMenuPrincipal) {
                     ((PanelMenuPrincipal) comp).actualizarBienvenida();
