@@ -64,21 +64,29 @@ public class Player {
     }
     
     public String obtenerUltimos10Juegos() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("═══════════════════════════════════════════════\n");
-        sb.append("    ÚLTIMOS 10 JUEGOS DE ").append(username).append("\n");
-        sb.append("═══════════════════════════════════════════════\n\n");
-        
-        for (int i = 0; i < 10; i++) {
-            sb.append((i + 1)).append("- ");
-            if (logsPartidas[i] != null) {
-                sb.append(logsPartidas[i]);
-            }
-            sb.append("\n");
+    StringBuilder sb = new StringBuilder();
+    sb.append("═══════════════════════════════════════════════════════════\n");
+    sb.append("           ÚLTIMOS 10 JUEGOS DE ").append(username).append("\n");
+    sb.append("═══════════════════════════════════════════════════════════\n\n");
+    
+    int partidasJugadas = 0;
+    for (int i = 0; i < 10; i++) {
+        if (logsPartidas[i] != null) {
+            sb.append(String.format("%2d. %s\n", (i + 1), logsPartidas[i]));
+            partidasJugadas++;
         }
-        
-        return sb.toString();
     }
+    
+    if (partidasJugadas == 0) {
+        sb.append("   No has jugado ninguna partida aún.\n");
+    }
+    
+    sb.append("\n═══════════════════════════════════════════════════════════\n");
+    sb.append("   Total de partidas registradas: ").append(partidasJugadas).append("/10\n");
+    sb.append("═══════════════════════════════════════════════════════════");
+    
+    return sb.toString();
+}
     
     @Override
     public String toString() {

@@ -179,39 +179,95 @@ public class PanelJuego extends JPanel {
     }
     
     private JPanel crearTablero(boolean esJugador1) {
-        JPanel panel = new JPanel(new GridLayout(8, 8, 2, 2));
-        panel.setBackground(new Color(0, 50, 100, 200));
-        panel.setBorder(BorderFactory.createLineBorder(Color.WHITE, 3));
-        
-        JButton[][] botones = new JButton[8][8];
-        
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                JButton boton = new JButton("~");
-                boton.setFont(new Font("Arial", Font.BOLD, 16));
-                boton.setBackground(new Color(0, 119, 190));
-                boton.setForeground(Color.WHITE);
-                boton.setFocusPainted(false);
-                boton.setBorder(BorderFactory.createLineBorder(new Color(0, 90, 150), 1));
-                
-                final int fila = i;
-                final int columna = j;
-                
-                boton.addActionListener(e -> manejarClicCelda(fila, columna, esJugador1));
-                
-                botones[i][j] = boton;
-                panel.add(boton);
-            }
-        }
-        
-        if (esJugador1) {
-            botonesTableroJ1 = botones;
-        } else {
-            botonesTableroJ2 = botones;
-        }
-        
-        return panel;
+    JPanel panelContenedor = new JPanel(new BorderLayout(5, 5));
+    panelContenedor.setOpaque(false);
+    
+    JPanel panelConCoordenadas = new JPanel(new BorderLayout(0, 0));
+    panelConCoordenadas.setOpaque(false);
+    
+    JPanel panelSuperior = new JPanel(new BorderLayout(0, 0));
+    panelSuperior.setOpaque(false);
+    
+    JLabel espacioEsquina = new JLabel("");
+    espacioEsquina.setPreferredSize(new Dimension(30, 30));
+    espacioEsquina.setOpaque(false);
+    panelSuperior.add(espacioEsquina, BorderLayout.WEST);
+    
+    JPanel panelColumnasSuperiores = new JPanel(new GridLayout(1, 8, 2, 2));
+    panelColumnasSuperiores.setOpaque(false);
+    
+    String[] columnas = {"A", "B", "C", "D", "E", "F", "G", "H"};
+    for (String col : columnas) {
+        JLabel lblColumna = new JLabel(col, SwingConstants.CENTER);
+        lblColumna.setFont(new Font("Arial", Font.BOLD, 14));
+        lblColumna.setForeground(Color.WHITE);
+        lblColumna.setOpaque(true);
+        lblColumna.setBackground(new Color(0, 0, 0, 150));
+        lblColumna.setBorder(BorderFactory.createLineBorder(new Color(255, 215, 0), 1));
+        panelColumnasSuperiores.add(lblColumna);
     }
+    
+    panelSuperior.add(panelColumnasSuperiores, BorderLayout.CENTER);
+    panelConCoordenadas.add(panelSuperior, BorderLayout.NORTH);
+    
+    JPanel panelCentral = new JPanel(new BorderLayout(0, 0));
+    panelCentral.setOpaque(false);
+    
+    JPanel panelFilasIzquierda = new JPanel(new GridLayout(8, 1, 2, 2));
+    panelFilasIzquierda.setOpaque(false);
+    
+    for (int i = 1; i <= 8; i++) {
+        JLabel lblFila = new JLabel(String.valueOf(i), SwingConstants.CENTER);
+        lblFila.setFont(new Font("Arial", Font.BOLD, 14));
+        lblFila.setForeground(Color.WHITE);
+        lblFila.setOpaque(true);
+        lblFila.setBackground(new Color(0, 0, 0, 150));
+        lblFila.setBorder(BorderFactory.createLineBorder(new Color(255, 215, 0), 1));
+        lblFila.setPreferredSize(new Dimension(30, 0));
+        panelFilasIzquierda.add(lblFila);
+    }
+    
+    panelCentral.add(panelFilasIzquierda, BorderLayout.WEST);
+    
+    JPanel panelTablero = new JPanel(new GridLayout(8, 8, 2, 2));
+    panelTablero.setBackground(new Color(0, 50, 100, 200));
+    panelTablero.setBorder(BorderFactory.createLineBorder(Color.WHITE, 3));
+    
+    JButton[][] botones = new JButton[8][8];
+    
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            JButton boton = new JButton("~");
+            boton.setFont(new Font("Arial", Font.BOLD, 16));
+            boton.setBackground(new Color(0, 119, 190));
+            boton.setForeground(Color.WHITE);
+            boton.setFocusPainted(false);
+            boton.setBorder(BorderFactory.createLineBorder(new Color(0, 90, 150), 1));
+            
+            final int fila = i;
+            final int columna = j;
+            
+            boton.addActionListener(e -> manejarClicCelda(fila, columna, esJugador1));
+            
+            botones[i][j] = boton;
+            panelTablero.add(boton);
+        }
+    }
+    
+    panelCentral.add(panelTablero, BorderLayout.CENTER);
+    
+    panelConCoordenadas.add(panelCentral, BorderLayout.CENTER);
+    
+    panelContenedor.add(panelConCoordenadas, BorderLayout.CENTER);
+    
+    if (esJugador1) {
+        botonesTableroJ1 = botones;
+    } else {
+        botonesTableroJ2 = botones;
+    }
+    
+        return panelContenedor;
+    }  
     
     private JPanel crearPanelInferior() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
@@ -273,37 +329,13 @@ public class PanelJuego extends JPanel {
     }
     
     private void iniciarFaseColocacion() {
-        JOptionPane.showMessageDialog(this,
-            "Bienvenido a Battleship Dinámico!\n\n" +
-            "Configuración actual:\n" +
-            "• Dificultad: " + Battleship.getDificultad() + "\n" +
-            "• Barcos por jugador: " + Battleship.getCantidadBarcos() + "\n" +
-            "• Modo: " + Battleship.getModoJuego() + "\n\n" +
-            "El Jugador 1 colocará sus barcos primero.",
-            "Inicio del Juego",
-            JOptionPane.INFORMATION_MESSAGE);
-        
-        mostrarInstruccionesColocacion();
+    JOptionPane.showMessageDialog(this,
+        "El Jugador 1 colocará sus barcos primero.\n\n" +
+        "Haga clic en una celda para empezar.",
+        "Inicio del Juego",
+        JOptionPane.INFORMATION_MESSAGE);
     }
     
-    private void mostrarInstruccionesColocacion() {
-        String instrucciones = "COLOCAR BARCOS:\n\n" +
-            "1. Seleccione el tipo de barco (PA, AZ, SM, DT)\n" +
-            "2. Haga clic en una celda del tablero\n" +
-            "3. Elija orientación (Horizontal o Vertical)\n\n" +
-            "Tipos de barcos:\n" +
-            "• PA (Portaaviones): 5 celdas\n" +
-            "• AZ (Acorazado): 4 celdas\n" +
-            "• SM (Submarino): 3 celdas\n" +
-            "• DT (Destructor): 2 celdas\n\n" +
-            "Barcos a colocar: " + (Battleship.getCantidadBarcos() - 
-                (faseActual == FASE_COLOCACION_J1 ? barcosColocadosJ1 : barcosColocadosJ2));
-        
-        JOptionPane.showMessageDialog(this,
-            instrucciones,
-            "Instrucciones",
-            JOptionPane.INFORMATION_MESSAGE);
-    }
     
     private void manejarClicCelda(int fila, int columna, boolean esJugador1) {
         if (juegoTerminado) {
@@ -416,30 +448,26 @@ public class PanelJuego extends JPanel {
     private void finalizarColocacionJ1() {
         faseActual = FASE_COLOCACION_J2;
         actualizarEstado();
-        
+    
         JOptionPane.showMessageDialog(this,
-            "Jugador 1 ha terminado de colocar sus barcos.\n\n" +
-            "Ahora es el turno del Jugador 2.",
-            "Fase Completada",
+            "Turno del Jugador 2.",
+            "Cambio de Jugador",
             JOptionPane.INFORMATION_MESSAGE);
-        
-        mostrarInstruccionesColocacion();
     }
     
     private void finalizarColocacionJ2() {
         faseActual = FASE_COMBATE;
         turnoJ1 = true;
-        
+    
         lblEstado.setText("¡COMBATE INICIADO!");
         lblTurno.setText("Turno del Jugador 1");
-        
+    
         actualizarContadores();
-        
-        JOptionPane.showMessageDialog(this,
-            "Ambos jugadores han colocado sus barcos.\n\n" +
-            "¡QUE COMIENCE LA BATALLA!",
-            "Inicio del Combate",
-            JOptionPane.INFORMATION_MESSAGE);
+    
+    JOptionPane.showMessageDialog(this,
+        "¡Que comience la batalla!",
+        "Combate",
+        JOptionPane.INFORMATION_MESSAGE);
     }
     
     private void manejarBombardeo(int fila, int columna, boolean clickEnTableroJ1) {
@@ -472,49 +500,37 @@ public class PanelJuego extends JPanel {
     }
     
     private void procesarResultadoBombardeo(String resultado, String[][] tableroObjetivo) {
-        if (resultado.equals("AGUA")) {
-            JOptionPane.showMessageDialog(this,
-                "💦 ¡Agua! El tiro falló.",
-                "Fallo",
-                JOptionPane.INFORMATION_MESSAGE);
-                
-        } else if (resultado.equals("YA_BOMBARDEADO")) {
-            JOptionPane.showMessageDialog(this,
-                "⚠ Esta celda ya fue bombardeada anteriormente.",
-                "Advertencia",
-                JOptionPane.WARNING_MESSAGE);
-                
-        } else if (resultado.startsWith("IMPACTO_")) {
-            String codigoBarco = resultado.substring(8);
-            String nombreBarco = obtenerNombreBarco(codigoBarco);
+    if (resultado.equals("AGUA")) {
+        JOptionPane.showMessageDialog(this,
+            "¡Agua!",
+            "Fallo",
+            JOptionPane.INFORMATION_MESSAGE);
             
-            JOptionPane.showMessageDialog(this,
-                "💥 ¡IMPACTO!\n\n" +
-                "Se ha bombardeado un " + nombreBarco + "!\n" +
-                "El barco aún no se ha hundido.",
-                "¡Impacto!",
-                JOptionPane.INFORMATION_MESSAGE);
-                
-        } else if (resultado.startsWith("HUNDIDO_")) {
-            String codigoBarco = resultado.substring(8);
-            String nombreBarco = obtenerNombreBarco(codigoBarco);
+    } else if (resultado.equals("YA_BOMBARDEADO")) {
+        JOptionPane.showMessageDialog(this,
+            "Celda ya bombardeada.",
+            "Advertencia",
+            JOptionPane.WARNING_MESSAGE);
             
-            JOptionPane.showMessageDialog(this,
-                "🔥 ¡¡¡HUNDIDO!!!\n\n" +
-                "Se ha hundido el " + nombreBarco + " del " +
-                (turnoJ1 ? "Jugador 2" : "Jugador 1") + "!",
-                "¡Barco Hundido!",
-                JOptionPane.INFORMATION_MESSAGE);
+    } else if (resultado.startsWith("IMPACTO_")) {
+        String codigoBarco = resultado.substring(8);
+        String nombreBarco = obtenerNombreBarco(codigoBarco);
+        
+        JOptionPane.showMessageDialog(this,
+            "¡Impacto en " + nombreBarco + "!",
+            "Impacto",
+            JOptionPane.INFORMATION_MESSAGE);
             
-            JOptionPane.showMessageDialog(this,
-                "⚡ ¡EL TABLERO SE HA REGENERADO!\n\n" +
-                "Los barcos restantes del " + (turnoJ1 ? "Jugador 2" : "Jugador 1") +
-                " han sido reposicionados aleatoriamente.\n\n" +
-                "Las marcas de impactos (X) y fallos (F) se mantienen.",
-                "Regeneración",
-                JOptionPane.WARNING_MESSAGE);
-        }
+    } else if (resultado.startsWith("HUNDIDO_")) {
+        String codigoBarco = resultado.substring(8);
+        String nombreBarco = obtenerNombreBarco(codigoBarco);
+        
+        JOptionPane.showMessageDialog(this,
+            "¡" + nombreBarco + " hundido!\n\nTablero regenerado.",
+            "Barco Hundido",
+            JOptionPane.INFORMATION_MESSAGE);
     }
+}
     
     private String obtenerNombreBarco(String codigo) {
         return codigo.equals("PA") ? "Portaaviones" :
@@ -524,104 +540,104 @@ public class PanelJuego extends JPanel {
     }
     
     private void actualizarTableros() {
-        boolean modoTutorial = Battleship.getModoJuego().equals("TUTORIAL");
-        
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                String celda = tableroJ1[i][j];
-                JButton boton = botonesTableroJ1[i][j];
-                
-                if (faseActual == FASE_COMBATE && !turnoJ1 && !modoTutorial) {
-                    if (!celda.equals("~") && !celda.equals("F") && !celda.equals("X")) {
-                        boton.setText("~");
-                        boton.setBackground(new Color(0, 119, 190));
-                        boton.setForeground(Color.WHITE);
-                    } else {
-                        actualizarBotonSegunCelda(boton, celda);
-                    }
+    boolean modoTutorial = Battleship.getModoJuego().equals("TUTORIAL");
+    
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            String celda = tableroJ1[i][j];
+            JButton boton = botonesTableroJ1[i][j];
+            
+            if (faseActual == FASE_COMBATE && turnoJ1 && !modoTutorial) {
+                if (!celda.equals("~") && !celda.equals("F") && !celda.equals("X")) {
+                    boton.setText("~");
+                    boton.setBackground(new Color(0, 119, 190));
+                    boton.setForeground(Color.WHITE);
                 } else {
                     actualizarBotonSegunCelda(boton, celda);
                 }
-            }
-        }
-        
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                String celda = tableroJ2[i][j];
-                JButton boton = botonesTableroJ2[i][j];
-                
-                if (faseActual == FASE_COMBATE && turnoJ1 && !modoTutorial) {
-                    if (!celda.equals("~") && !celda.equals("F") && !celda.equals("X")) {
-                        boton.setText("~");
-                        boton.setBackground(new Color(0, 119, 190));
-                    } else {
-                        actualizarBotonSegunCelda(boton, celda);
-                    }
-                } else {
-                    actualizarBotonSegunCelda(boton, celda);
-                }
+            } else {
+                actualizarBotonSegunCelda(boton, celda);
             }
         }
     }
     
-    private void actualizarBotonSegunCelda(JButton boton, String celda) {
-        boton.setText("");
-        boton.setBackground(new Color(0, 119, 190));
-        boton.setForeground(Color.WHITE);
-        boton.setFont(new Font("Arial", Font.BOLD, 16));
-        
-        switch (celda) {
-            case "~":
-                boton.setText("~");
-                boton.setBackground(new Color(0, 119, 190));
-                break;
-                
-            case "F":
-                boton.setText("F");
-                boton.setBackground(new Color(173, 216, 230));
-                boton.setForeground(Color.DARK_GRAY);
-                break;
-                
-            case "X":
-                boton.setText("X");
-                boton.setBackground(new Color(220, 20, 60));
-                boton.setForeground(Color.WHITE);
-                boton.setFont(new Font("Arial", Font.BOLD, 20));
-                break;
-                
-            case "PA":
-                boton.setText("PA");
-                boton.setBackground(new Color(46, 204, 113));
-                boton.setForeground(Color.WHITE);
-                boton.setFont(new Font("Arial", Font.BOLD, 14));
-                break;
-                
-            case "AZ":
-                boton.setText("AZ");
-                boton.setBackground(new Color(155, 89, 182));
-                boton.setForeground(Color.WHITE);
-                boton.setFont(new Font("Arial", Font.BOLD, 14));
-                break;
-                
-            case "SM":
-                boton.setText("SM");
-                boton.setBackground(new Color(230, 126, 34));
-                boton.setForeground(Color.WHITE);
-                boton.setFont(new Font("Arial", Font.BOLD, 14));
-                break;
-                
-            case "DT":
-                boton.setText("DT");
-                boton.setBackground(new Color(241, 196, 15));
-                boton.setForeground(Color.BLACK);
-                boton.setFont(new Font("Arial", Font.BOLD, 14));
-                break;
-                
-            default:
-                boton.setText(celda);
-                break;
+    for (int i = 0; i < 8; i++) {
+        for (int j = 0; j < 8; j++) {
+            String celda = tableroJ2[i][j];
+            JButton boton = botonesTableroJ2[i][j];
+            
+            if (faseActual == FASE_COMBATE && !turnoJ1 && !modoTutorial) {
+                if (!celda.equals("~") && !celda.equals("F") && !celda.equals("X")) {
+                    boton.setText("~");
+                    boton.setBackground(new Color(0, 119, 190));
+                } else {
+                    actualizarBotonSegunCelda(boton, celda);
+                }
+            } else {
+                actualizarBotonSegunCelda(boton, celda);
+            }
         }
     }
+}
+    
+    private void actualizarBotonSegunCelda(JButton boton, String celda) {
+    boton.setText("");
+    boton.setBackground(new Color(0, 119, 190));
+    boton.setForeground(Color.WHITE);
+    boton.setFont(new Font("Arial", Font.BOLD, 16));
+    
+    switch (celda) {
+        case "~":
+            boton.setText("~");
+            boton.setBackground(new Color(0, 119, 190));
+            break;
+            
+        case "F":
+            boton.setText("F");
+            boton.setBackground(new Color(135, 206, 250));
+            boton.setForeground(new Color(70, 130, 180));
+            break;
+            
+        case "X":
+            boton.setText("X");
+            boton.setBackground(new Color(178, 34, 34));
+            boton.setForeground(Color.WHITE);
+            boton.setFont(new Font("Arial", Font.BOLD, 22));
+            break;
+            
+        case "PA":
+            boton.setText("PA");
+            boton.setBackground(new Color(25, 25, 112));
+            boton.setForeground(Color.WHITE);
+            boton.setFont(new Font("Arial", Font.BOLD, 13));
+            break;
+            
+        case "AZ":
+            boton.setText("AZ");
+            boton.setBackground(new Color(105, 105, 105));
+            boton.setForeground(Color.WHITE);
+            boton.setFont(new Font("Arial", Font.BOLD, 13));
+            break;
+            
+        case "SM":
+            boton.setText("SM");
+            boton.setBackground(new Color(85, 107, 47));
+            boton.setForeground(Color.WHITE);
+            boton.setFont(new Font("Arial", Font.BOLD, 13));
+            break;
+            
+        case "DT":
+            boton.setText("DT");
+            boton.setBackground(new Color(139, 69, 19));
+            boton.setForeground(Color.WHITE);
+            boton.setFont(new Font("Arial", Font.BOLD, 13));
+            break;
+            
+        default:
+            boton.setText(celda);
+            break;
+    }
+}
     
     private void actualizarContadores() {
         barcosRestantesJ1 = Battleship.contarBarcosRestantes(tableroJ1);
@@ -660,77 +676,87 @@ public class PanelJuego extends JPanel {
     }
     
     private void finalizarJuego() {
+    juegoTerminado = true;
+    deshabilitarTableros();
+    
+    String ganador;
+    String perdedor;
+    Player jugadorGanador;
+    Player jugadorPerdedor;
+    
+    if (barcosRestantesJ1 == 0) {
+        ganador = jugador2.getUsername();
+        perdedor = jugador1.getUsername();
+        jugadorGanador = jugador2;
+        jugadorPerdedor = jugador1;
+    } else {
+        ganador = jugador1.getUsername();
+        perdedor = jugador2.getUsername();
+        jugadorGanador = jugador1;
+        jugadorPerdedor = jugador2;
+    }
+    
+    jugadorGanador.agregarPuntos(3);
+    
+    String logGanador = ganador + " hundió todos los barcos de " + perdedor + 
+                        " [" + Battleship.getDificultad() + "/" + Battleship.getModoJuego() + "] +3pts";
+    jugadorGanador.agregarLog(logGanador);
+    
+    String logPerdedor = perdedor + " perdió contra " + ganador + 
+                         " [" + Battleship.getDificultad() + "/" + Battleship.getModoJuego() + "] 0pts";
+    jugadorPerdedor.agregarLog(logPerdedor);
+    
+    JOptionPane.showMessageDialog(this,
+        "🏆 ¡JUEGO TERMINADO! 🏆\n\n" +
+        "Ganador: " + ganador + "\n\n" +
+        ganador + " hundió todos los barcos de " + perdedor + "\n\n" +
+        "+3 puntos para " + ganador,
+        "¡Victoria!",
+        JOptionPane.INFORMATION_MESSAGE);
+    
+    btnRendirse.setEnabled(false);
+    btnVolverMenu.setEnabled(true);
+    lblEstado.setText("JUEGO TERMINADO - " + ganador.toUpperCase() + " GANÓ");
+}
+    
+    private void manejarRendicion() {
+    int confirmacion = JOptionPane.showConfirmDialog(this,
+        "¿Está seguro que desea rendirse?\n\n" +
+        "El otro jugador ganará automáticamente.",
+        "Confirmar Rendición",
+        JOptionPane.YES_NO_OPTION,
+        JOptionPane.WARNING_MESSAGE);
+    
+    if (confirmacion == JOptionPane.YES_OPTION) {
         juegoTerminado = true;
         deshabilitarTableros();
         
-        String ganador;
-        String perdedor;
-        Player jugadorGanador;
-        Player jugadorPerdedor;
-        
-        if (barcosRestantesJ1 == 0) {
-            ganador = jugador2.getUsername();
-            perdedor = jugador1.getUsername();
-            jugadorGanador = jugador2;
-            jugadorPerdedor = jugador1;
-        } else {
-            ganador = jugador1.getUsername();
-            perdedor = jugador2.getUsername();
-            jugadorGanador = jugador1;
-            jugadorPerdedor = jugador2;
-        }
+        String ganador = turnoJ1 ? jugador2.getUsername() : jugador1.getUsername();
+        String perdedor = turnoJ1 ? jugador1.getUsername() : jugador2.getUsername();
+        Player jugadorGanador = turnoJ1 ? jugador2 : jugador1;
+        Player jugadorPerdedor = turnoJ1 ? jugador1 : jugador2;
         
         jugadorGanador.agregarPuntos(3);
         
-        String log = ganador + " hundió todos los barcos de " + perdedor + 
-                     " en modo " + Battleship.getDificultad() + ".";
-        jugadorGanador.agregarLog(log);
+        String logGanador = ganador + " ganó por rendición de " + perdedor + 
+                            " [" + Battleship.getDificultad() + "/" + Battleship.getModoJuego() + "] +3pts";
+        jugadorGanador.agregarLog(logGanador);
+        
+        String logPerdedor = perdedor + " se rindió contra " + ganador + 
+                             " [" + Battleship.getDificultad() + "/" + Battleship.getModoJuego() + "] 0pts";
+        jugadorPerdedor.agregarLog(logPerdedor);
         
         JOptionPane.showMessageDialog(this,
-            "🏆 ¡JUEGO TERMINADO! 🏆\n\n" +
-            "Ganador: " + ganador + "\n\n" +
-            ganador + " hundió todos los barcos de " + perdedor + "\n\n" +
-            "+3 puntos para " + ganador,
-            "¡Victoria!",
+            perdedor + " se ha rendido.\n\n" +
+            "¡" + ganador + " gana por retiro!",
+            "Victoria por Retiro",
             JOptionPane.INFORMATION_MESSAGE);
         
         btnRendirse.setEnabled(false);
         btnVolverMenu.setEnabled(true);
-        lblEstado.setText("JUEGO TERMINADO - " + ganador.toUpperCase() + " GANÓ");
+        lblEstado.setText("JUEGO TERMINADO - RENDICIÓN");
     }
-    
-    private void manejarRendicion() {
-        int confirmacion = JOptionPane.showConfirmDialog(this,
-            "¿Está seguro que desea rendirse?\n\n" +
-            "El otro jugador ganará automáticamente.",
-            "Confirmar Rendición",
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.WARNING_MESSAGE);
-        
-        if (confirmacion == JOptionPane.YES_OPTION) {
-            juegoTerminado = true;
-            deshabilitarTableros();
-            
-            String ganador = turnoJ1 ? jugador2.getUsername() : jugador1.getUsername();
-            String perdedor = turnoJ1 ? jugador1.getUsername() : jugador2.getUsername();
-            Player jugadorGanador = turnoJ1 ? jugador2 : jugador1;
-            
-            jugadorGanador.agregarPuntos(3);
-            
-            String log = perdedor + " se retiró del juego dejando como ganador a " + ganador + ".";
-            jugadorGanador.agregarLog(log);
-            
-            JOptionPane.showMessageDialog(this,
-                perdedor + " se ha rendido.\n\n" +
-                "¡" + ganador + " gana por retiro!",
-                "Victoria por Retiro",
-                JOptionPane.INFORMATION_MESSAGE);
-            
-            btnRendirse.setEnabled(false);
-            btnVolverMenu.setEnabled(true);
-            lblEstado.setText("JUEGO TERMINADO - RENDICIÓN");
-        }
-    }
+}
     
     private void deshabilitarTableros() {
         for (int i = 0; i < 8; i++) {

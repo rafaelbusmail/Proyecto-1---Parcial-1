@@ -17,10 +17,10 @@ public class VentanaPrincipal extends JFrame {
     private void configurarVentana() {
         setTitle("Battleship Dinámico");
         setSize(1000, 700);
-        setUndecorated(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        setResizable(false);
+        setResizable(true);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
     }
     
     private void inicializarComponentes() {
