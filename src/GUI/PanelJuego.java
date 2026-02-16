@@ -554,46 +554,54 @@ public class PanelJuego extends JPanel {
         }
     }
 
-    private void actualizarTableros() {
-        boolean modoTutorial = Battleship.getModoJuego().equals("TUTORIAL");
+        private void actualizarTableros() {
+        String modo = Battleship.getModoJuego();
+        boolean modoArcade   = modo.equals("ARCADE");
+        boolean modoTutorial = modo.equals("TUTORIAL");
 
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                String celda = tableroJ1[i][j];
+                String celda  = tableroJ1[i][j];
                 JButton boton = botonesTableroJ1[i][j];
-                
                 boolean esBarco = !celda.equals("~") && !celda.equals("F") && !celda.equals("X");
 
-                if (faseActual == FASE_COMBATE && esBarco) {
-                    if (turnoJ1 || modoTutorial) {
-                        actualizarBotonSegunCelda(boton, celda);
-                    } else {
-                        actualizarBotonSegunCelda(boton, "~");
-                    }
+            if (!modoTutorial && faseActual == FASE_COMBATE && esBarco) {
+                boolean ocultarJ1 = modoArcade ? true : !turnoJ1;
+                if (ocultarJ1) {
+                    boton.setText("~");
+                    boton.setBackground(new Color(0, 119, 190));
+                    boton.setForeground(Color.WHITE);
                 } else {
                     actualizarBotonSegunCelda(boton, celda);
                 }
-            }
-        }
-
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                String celda = tableroJ2[i][j];
-                JButton boton = botonesTableroJ2[i][j];
-                boolean esBarco = !celda.equals("~") && !celda.equals("F") && !celda.equals("X");
-
-                if (faseActual == FASE_COMBATE && esBarco) {
-                    if (!turnoJ1 || modoTutorial) {
-                        actualizarBotonSegunCelda(boton, celda);
-                    } else {
-                        actualizarBotonSegunCelda(boton, "~");
-                    }
-                } else {
-                    actualizarBotonSegunCelda(boton, celda);
-                }
+            } else {
+                actualizarBotonSegunCelda(boton, celda);
             }
         }
     }
+
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                String celda  = tableroJ2[i][j];
+                JButton boton = botonesTableroJ2[i][j];
+                boolean esBarco = !celda.equals("~") && !celda.equals("F") && !celda.equals("X");
+
+            if (!modoTutorial && faseActual == FASE_COMBATE && esBarco) {
+                boolean ocultarJ2 = modoArcade ? true : turnoJ1;
+                if (ocultarJ2) {
+                    boton.setText("~");
+                    boton.setBackground(new Color(0, 119, 190));
+                    boton.setForeground(Color.WHITE);
+                } else {
+                    actualizarBotonSegunCelda(boton, celda);
+                }
+            } else {
+                actualizarBotonSegunCelda(boton, celda);
+            }
+        }
+    }
+}
+
 
     private void actualizarBotonSegunCelda(JButton boton, String celda) {
         boton.setFont(new Font("Arial", Font.BOLD, 16));

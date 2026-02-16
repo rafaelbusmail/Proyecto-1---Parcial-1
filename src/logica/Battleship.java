@@ -6,7 +6,7 @@ import java.util.Random;
 
 public class Battleship {
 
-    private static ArrayList<Player> jugadores = new ArrayList<>();
+    private static final ArrayList<Player> jugadores = new ArrayList<>();
     private static Player usuarioActual = null;
 
     private static String dificultad = "NORMAL";
@@ -45,6 +45,10 @@ public class Battleship {
         }
         return null;
     }
+    
+    public static Player obtenerJugador(String username){
+    return buscarJugadorPorUsername(username);
+    }   
 
     public static boolean actualizarUsername(String nuevoUsername) {
         if (usuarioActual == null) return false;
@@ -113,19 +117,26 @@ public class Battleship {
     }
 
     public static void inicializarJuego(Player j1, Player j2) {
+
         jugador1 = j1;
         jugador2 = j2;
+
+        if (!jugadores.contains(j1)) jugadores.add(j1);
+        if (!jugadores.contains(j2)) jugadores.add(j2);
 
         tableroJugador1 = new String[8][8];
         tableroJugador2 = new String[8][8];
 
-        for (String[] fila : tableroJugador1) {
-            for (int j = 0; j < fila.length; j++) fila[j] = "~";
-        }
-        for (String[] fila : tableroJugador2) {
-            for (int j = 0; j < fila.length; j++) fila[j] = "~";
-        }
+        for (String[] fila : tableroJugador1)
+            for (int j = 0; j < fila.length; j++)
+                fila[j] = "~";
+
+        for (String[] fila : tableroJugador2)
+            for (int j = 0; j < fila.length; j++)
+                fila[j] = "~";
     }
+
+
 
     public static String[][] getTableroJugador1() { return tableroJugador1; }
     public static String[][] getTableroJugador2() { return tableroJugador2; }
