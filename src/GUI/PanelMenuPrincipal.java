@@ -1,5 +1,3 @@
-
-
 package GUI;
 
 import logica.Battleship;
@@ -36,20 +34,19 @@ public class PanelMenuPrincipal extends JPanel {
     }
     
     private void cargarImagenFondo() {
-    try {
-        
-        URL url = getClass().getResource("/imagenes/fondo_menu.jpg");
-        if (url != null) {
-            imagenFondo = ImageIO.read(url);
-        } else {
-            System.err.println("No se encontró la imagen en: /imagenes/fondo_login.jpg");
+        try {
+            URL url = getClass().getResource("/imagenes/fondo_menu.jpg");
+            if (url != null) {
+                imagenFondo = ImageIO.read(url);
+            } else {
+                System.err.println("No se encontró la imagen en: /imagenes/fondo_menu.jpg");
+                imagenFondo = null;
+            }
+        } catch (IOException e) {
+            System.err.println("Error al cargar imagen: " + e.getMessage());
             imagenFondo = null;
         }
-    } catch (IOException e) {
-        System.err.println("Error al cargar imagen: " + e.getMessage());
-        imagenFondo = null;
     }
-}
     
     private void configurarPanel() {
         setLayout(new GridBagLayout());
@@ -71,7 +68,6 @@ public class PanelMenuPrincipal extends JPanel {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         
-        // Panel semitransparente de los botones esos
         JPanel panelMenu = new JPanel(new GridBagLayout());
         panelMenu.setBackground(new Color(0, 0, 0, 180));
         panelMenu.setBorder(BorderFactory.createEmptyBorder(30, 40, 30, 40));
@@ -81,7 +77,6 @@ public class PanelMenuPrincipal extends JPanel {
         gbcMenu.fill = GridBagConstraints.HORIZONTAL;
         gbcMenu.gridx = 0;
         
-        // Mensaje de bienvenida
         lblBienvenida = new JLabel();
         lblBienvenida.setFont(new Font("Arial", Font.BOLD, 28));
         lblBienvenida.setForeground(Color.WHITE);
@@ -89,60 +84,47 @@ public class PanelMenuPrincipal extends JPanel {
         gbcMenu.gridy = 0;
         panelMenu.add(lblBienvenida, gbcMenu);
         
-        // Puntos del jugador
         lblPuntos = new JLabel();
         lblPuntos.setFont(new Font("Arial", Font.PLAIN, 16));
-        lblPuntos.setForeground(new Color(255, 215, 0)); // Dorado
+        lblPuntos.setForeground(new Color(255, 215, 0)); 
         lblPuntos.setHorizontalAlignment(SwingConstants.CENTER);
         gbcMenu.gridy = 1;
         panelMenu.add(lblPuntos, gbcMenu);
         
-        // Espacio
         gbcMenu.gridy = 2;
         panelMenu.add(Box.createVerticalStrut(20), gbcMenu);
         
-        // Botón Jugar
-        btnJugar = crearBotonMenu("🎮 JUGAR BATTLESHIP");
-        btnJugar.setBackground(new Color(39, 174, 96));
+        btnJugar = crearBotonMenu("🎮 JUGAR BATTLESHIP", new Color(39, 174, 96));
         btnJugar.addActionListener(e -> iniciarJuego());
         gbcMenu.gridy = 3;
         panelMenu.add(btnJugar, gbcMenu);
         
-        // Botón Configuración
-        btnConfiguracion = crearBotonMenu("⚙ CONFIGURACIÓN");
-        btnConfiguracion.setBackground(new Color(52, 152, 219));
+        btnConfiguracion = crearBotonMenu("⚙ CONFIGURACIÓN", new Color(52, 152, 219));
         btnConfiguracion.addActionListener(e -> mostrarConfiguracion());
         gbcMenu.gridy = 4;
         panelMenu.add(btnConfiguracion, gbcMenu);
         
-        // Botón Reportes
-        btnReportes = crearBotonMenu("📊 REPORTES");
-        btnReportes.setBackground(new Color(155, 89, 182));
+        btnReportes = crearBotonMenu("📊 REPORTES", new Color(155, 89, 182));
         btnReportes.addActionListener(e -> mostrarReportes());
         gbcMenu.gridy = 5;
         panelMenu.add(btnReportes, gbcMenu);
         
-        // Botón Perfil
-        btnPerfil = crearBotonMenu("👤 MI PERFIL");
-        btnPerfil.setBackground(new Color(230, 126, 34));
+        btnPerfil = crearBotonMenu("👤 MI PERFIL", new Color(230, 126, 34));
         btnPerfil.addActionListener(e -> mostrarPerfil());
         gbcMenu.gridy = 6;
         panelMenu.add(btnPerfil, gbcMenu);
         
-        // Botón Cerrar Sesión
-        btnCerrarSesion = crearBotonMenu("🚪 CERRAR SESIÓN");
-        btnCerrarSesion.setBackground(new Color(231, 76, 60));
+        btnCerrarSesion = crearBotonMenu("🚪 CERRAR SESIÓN", new Color(231, 76, 60));
         btnCerrarSesion.addActionListener(e -> manejarCerrarSesion());
         gbcMenu.gridy = 7;
         panelMenu.add(btnCerrarSesion, gbcMenu);
         
-        // Agregar panel al centro
         gbc.gridx = 0;
         gbc.gridy = 0;
         add(panelMenu, gbc);
     }
     
-    private JButton crearBotonMenu(String texto) {
+    private JButton crearBotonMenu(String texto, Color colorBase) {
         JButton boton = new JButton(texto);
         boton.setFont(new Font("Arial", Font.BOLD, 18));
         boton.setForeground(Color.WHITE);
@@ -151,13 +133,18 @@ public class PanelMenuPrincipal extends JPanel {
         boton.setPreferredSize(new Dimension(350, 60));
         boton.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
         
-        // Efecto hover
+        boton.setBackground(colorBase);
+        
         boton.addMouseListener(new java.awt.event.MouseAdapter() {
-            Color colorOriginal = boton.getBackground();
+            private final Color colorOriginal = colorBase;
+            
+            @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 boton.setBackground(colorOriginal.brighter());
                 boton.setBorder(BorderFactory.createLineBorder(new Color(255, 215, 0), 3));
             }
+            
+            @Override
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 boton.setBackground(colorOriginal);
                 boton.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
@@ -175,19 +162,17 @@ public class PanelMenuPrincipal extends JPanel {
     }
     
     private void iniciarJuego() {
-        // Pedir nombre del jugador 2
         String usernameJ2 = JOptionPane.showInputDialog(this,
             "Ingrese el username del Jugador 2:\n(Escriba EXIT para cancelar)",
             "Jugador 2",
             JOptionPane.QUESTION_MESSAGE);
         
         if (usernameJ2 == null || usernameJ2.trim().equalsIgnoreCase("EXIT")) {
-            return; // Cancelar
+            return; 
         }
         
         usernameJ2 = usernameJ2.trim();
         
-        // Validar que el jugador 2 existe
         model.Player jugador2 = Battleship.buscarJugadorPorUsername(usernameJ2);
         
         if (jugador2 == null) {
@@ -206,10 +191,8 @@ public class PanelMenuPrincipal extends JPanel {
             return;
         }
         
-        // Inicializar juego
         Battleship.inicializarJuego(Battleship.getUsuarioActual(), jugador2);
         
-        // Ir a pantalla de juego
         for (Component comp : panelContenido.getComponents()) {
             if (comp instanceof PanelJuego) {
                 ((PanelJuego) comp).iniciarPartida();
@@ -220,7 +203,6 @@ public class PanelMenuPrincipal extends JPanel {
     }
     
     private void mostrarConfiguracion() {
-        // Submenú de configuración
         String[] opciones = {"Cambiar Dificultad", "Cambiar Modo de Juego", "Volver"};
         
         int seleccion = JOptionPane.showOptionDialog(this,
@@ -401,26 +383,23 @@ public class PanelMenuPrincipal extends JPanel {
     private void verDatos() {
         model.Player usuario = Battleship.getUsuarioActual();
     
-    // 1. Declarar y construir la variable asteriscos primero
-    String asteriscos = "";
-    for (int i = 0; i < usuario.getPassword().length(); i++) {
-        asteriscos += "●";
+        String asteriscos = "";
+        for (int i = 0; i < usuario.getPassword().length(); i++) {
+            asteriscos += "●";
+        }
+        
+        String datos = "═══════════════════════════════════\n" +
+                       "           MIS DATOS\n" +
+                       "═══════════════════════════════════\n\n" +
+                       "Username: " + usuario.getUsername() + "\n" +
+                       "Puntos: " + usuario.getPuntos() + "\n" +
+                       "Password: " + asteriscos + "\n";
+        
+        JOptionPane.showMessageDialog(this,
+            datos,
+            "Mis Datos",
+            JOptionPane.INFORMATION_MESSAGE);
     }
-    
-    // 2. Declarar y construir la variable datos usando asteriscos
-    String datos = "═══════════════════════════════════\n" +
-                   "           MIS DATOS\n" +
-                   "═══════════════════════════════════\n\n" +
-                   "Username: " + usuario.getUsername() + "\n" +
-                   "Puntos: " + usuario.getPuntos() + "\n" +
-                   "Password: " + asteriscos + "\n";
-    
-    // 3. Mostrar el diálogo
-    JOptionPane.showMessageDialog(this,
-        datos,
-        "Mis Datos",
-        JOptionPane.INFORMATION_MESSAGE);
-}
     
     private void modificarDatos() {
         String[] opciones = {"Cambiar Username", "Cambiar Password", "Cancelar"};

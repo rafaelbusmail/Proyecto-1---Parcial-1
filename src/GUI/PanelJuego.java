@@ -1,6 +1,5 @@
-
-
 package GUI;
+
 import logica.Battleship;
 import model.Player;
 import javax.swing.*;
@@ -56,10 +55,9 @@ public class PanelJuego extends JPanel {
     private JButton btnRendirse;
     private JButton btnVolverMenu;
     
-    // ═══════════════════════════════════════════════════════════
-    //                    CONSTRUCTOR
-    // ═══════════════════════════════════════════════════════════
+    private boolean juegoTerminado = false;
     
+   
     public PanelJuego(CardLayout cardLayout, JPanel panelContenido) {
         this.cardLayout = cardLayout;
         this.panelContenido = panelContenido;
@@ -101,9 +99,6 @@ public class PanelJuego extends JPanel {
         }
     }
     
-    // ═══════════════════════════════════════════════════════════
-    //                    CREACIÓN DE COMPONENTES
-    // ═══════════════════════════════════════════════════════════
     
     private void crearComponentes() {
         // Panel superior (información)
@@ -261,17 +256,13 @@ public class PanelJuego extends JPanel {
         
         return panel;
     }
-    
-    // ═══════════════════════════════════════════════════════════
-    //                    INICIALIZACIÓN DEL JUEGO
-    // ═══════════════════════════════════════════════════════════
-    
+   
     public void iniciarPartida() {
         tableroJ1 = Battleship.getTableroJugador1();
         tableroJ2 = Battleship.getTableroJugador2();
         
         jugador1 = Battleship.getUsuarioActual();
-        jugador2 = Battleship.getJugador2(); 
+        jugador2 = Battleship.getJugador2();
         
         // Resetear variables
         faseActual = FASE_COLOCACION_J1;
@@ -280,6 +271,7 @@ public class PanelJuego extends JPanel {
         barcosUsadosJ1.clear();
         barcosUsadosJ2.clear();
         turnoJ1 = true;
+        juegoTerminado = false; 
         
         barcosRestantesJ1 = Battleship.getCantidadBarcos();
         barcosRestantesJ2 = Battleship.getCantidadBarcos();
@@ -328,11 +320,12 @@ public class PanelJuego extends JPanel {
             JOptionPane.INFORMATION_MESSAGE);
     }
     
-    // ═══════════════════════════════════════════════════════════
-    //                    MANEJO DE CLICS
-    // ═══════════════════════════════════════════════════════════
     
     private void manejarClicCelda(int fila, int columna, boolean esJugador1) {
+        if (juegoTerminado) {
+            return;
+        }
+        
         if (faseActual == FASE_COLOCACION_J1 && esJugador1) {
             colocarBarcoEnCelda(fila, columna, tableroJ1, barcosUsadosJ1, true);
         } else if (faseActual == FASE_COLOCACION_J2 && !esJugador1) {
@@ -461,11 +454,7 @@ public class PanelJuego extends JPanel {
         lblTurno.setText("Turno del Jugador 1");
         actualizarContadores();
     }
-    
-    // ═══════════════════════════════════════════════════════════
-    //                    LÓGICA DE BOMBARDEO
-    // ═══════════════════════════════════════════════════════════
-    
+  
     private void manejarBombardeo(int fila, int columna, boolean clickEnTableroJ1) {
         boolean bombardeaJ1 = turnoJ1 && !clickEnTableroJ1;
         boolean bombardeaJ2 = !turnoJ1 && clickEnTableroJ1;
@@ -481,21 +470,16 @@ public class PanelJuego extends JPanel {
         String[][] tableroObjetivo = turnoJ1 ? tableroJ2 : tableroJ1;
         Battleship.limpiarMarcasFallidas(tableroObjetivo);
 
-        // Realizar bombardeo
         String resultado = Battleship.bombardear(tableroObjetivo, fila, columna);
 
-        // Procesar resultado
         procesarResultadoBombardeo(resultado, tableroObjetivo);
 
-        // Actualizar UI
         actualizarTableros();
         actualizarContadores();
 
-        // Verificar fin del juego
         if (Battleship.juegoTerminado()) {
             finalizarJuego();
         } else {
-            // Cambiar turno
             turnoJ1 = !turnoJ1;
             lblTurno.setText("Turno del " + (turnoJ1 ? "Jugador 1" : "Jugador 2"));
         }
@@ -552,9 +536,6 @@ public class PanelJuego extends JPanel {
                codigo.equals("DT") ? "Destructor" : "Barco";
     }
     
-    // ═══════════════════════════════════════════════════════════
-    //                    ACTUALIZACIÓN DE UI
-    // ═══════════════════════════════════════════════════════════
     
     private void actualizarTableros() {
         boolean modoTutorial = Battleship.getModoJuego().equals("TUTORIAL");
@@ -568,7 +549,6 @@ public class PanelJuego extends JPanel {
                 if (faseActual == FASE_COMBATE && !turnoJ1 && !modoTutorial) {
                     if (!celda.equals("~") && !celda.equals("F") && !celda.equals("X")) {
                         boton.setText("~");
-                        boton.setIcon(null);
                         boton.setBackground(new Color(0, 119, 190));
                         boton.setForeground(Color.WHITE);
                     } else {
@@ -589,7 +569,6 @@ public class PanelJuego extends JPanel {
                 if (faseActual == FASE_COMBATE && turnoJ1 && !modoTutorial) {
                     if (!celda.equals("~") && !celda.equals("F") && !celda.equals("X")) {
                         boton.setText("~");
-                        boton.setIcon(null);
                         boton.setBackground(new Color(0, 119, 190));
                     } else {
                         actualizarBotonSegunCelda(boton, celda);
@@ -602,55 +581,62 @@ public class PanelJuego extends JPanel {
     }
     
     private void actualizarBotonSegunCelda(JButton boton, String celda) {
-        boton.setIcon(null);
+        // Resetear
         boton.setText("");
         boton.setBackground(new Color(0, 119, 190));
-        
-        String rutaImagen = "";
+        boton.setForeground(Color.WHITE);
+        boton.setFont(new Font("Arial", Font.BOLD, 16));
         
         switch (celda) {
-            case "~":
-                rutaImagen = "/imagenes/agua.png";
+            case "~": // Agua
+                boton.setText("~");
+                boton.setBackground(new Color(0, 119, 190));
                 break;
-            case "F":
-                boton.setBackground(new Color(173, 216, 230));
-                rutaImagen = "/imagenes/fallo.png"; // ✅ NUEVO
+                
+            case "F": // Fallo
+                boton.setText("F");
+                boton.setBackground(new Color(173, 216, 230)); // Azul claro
+                boton.setForeground(Color.DARK_GRAY);
                 break;
-            case "X":
-                rutaImagen = "/imagenes/impacto.png";
+                
+            case "X": // Impacto
+                boton.setText("X");
+                boton.setBackground(new Color(220, 20, 60)); // Rojo crimson
+                boton.setForeground(Color.WHITE);
+                boton.setFont(new Font("Arial", Font.BOLD, 20));
                 break;
-            case "PA":
-                rutaImagen = "/imagenes/portaaviones.png";
+                
+            case "PA": // Portaaviones
+                boton.setText("PA");
+                boton.setBackground(new Color(46, 204, 113)); // Verde
+                boton.setForeground(Color.WHITE);
+                boton.setFont(new Font("Arial", Font.BOLD, 14));
                 break;
-            case "AZ":
-                rutaImagen = "/imagenes/acorazado.png";
+                
+            case "AZ": // Acorazado
+                boton.setText("AZ");
+                boton.setBackground(new Color(155, 89, 182)); // Morado
+                boton.setForeground(Color.WHITE);
+                boton.setFont(new Font("Arial", Font.BOLD, 14));
                 break;
-            case "SM":
-                rutaImagen = "/imagenes/submarino.png";
+                
+            case "SM": // Submarino
+                boton.setText("SM");
+                boton.setBackground(new Color(230, 126, 34)); // Naranja
+                boton.setForeground(Color.WHITE);
+                boton.setFont(new Font("Arial", Font.BOLD, 14));
                 break;
-            case "DT":
-                rutaImagen = "/imagenes/destructor.png";
+                
+            case "DT": // Destructor
+                boton.setText("DT");
+                boton.setBackground(new Color(241, 196, 15)); // Amarillo
+                boton.setForeground(Color.BLACK);
+                boton.setFont(new Font("Arial", Font.BOLD, 14));
                 break;
+                
             default:
                 boton.setText(celda);
-                return;
-        }
-        
-        if (!rutaImagen.isEmpty()) {
-            try {
-                URL imgUrl = getClass().getResource(rutaImagen);
-                if (imgUrl != null) {
-                    ImageIcon icon = new ImageIcon(imgUrl);
-                    int width = boton.getWidth() > 0 ? boton.getWidth() - 4 : 50;
-                    int height = boton.getHeight() > 0 ? boton.getHeight() - 4 : 50;
-                    Image img = icon.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH);
-                    boton.setIcon(new ImageIcon(img));
-                } else {
-                    boton.setText(celda);
-                }
-            } catch (Exception e) {
-                boton.setText(celda);
-            }
+                break;
         }
     }
     
@@ -676,11 +662,12 @@ public class PanelJuego extends JPanel {
         }
     }
     
-    // ═══════════════════════════════════════════════════════════
-    //                    FIN DEL JUEGO
-    // ═══════════════════════════════════════════════════════════
     
     private void finalizarJuego() {
+        juegoTerminado = true;
+        
+        deshabilitarTableros();
+        
         String ganador;
         String perdedor;
         Player jugadorGanador;
@@ -700,7 +687,6 @@ public class PanelJuego extends JPanel {
         
         jugadorGanador.agregarPuntos(3);
         
-        // log del ganador
         String log = ganador + " hundió todos los barcos de " + perdedor + 
                      " en modo " + Battleship.getDificultad() + ".";
         jugadorGanador.agregarLog(log);
@@ -718,7 +704,6 @@ public class PanelJuego extends JPanel {
         lblEstado.setText("JUEGO TERMINADO - " + ganador.toUpperCase() + " GANÓ");
     }
     
-    // lo mismo (puntos y logs correctamente) en rendición
     private void manejarRendicion() {
         int confirmacion = JOptionPane.showConfirmDialog(this,
             "¿Está seguro que desea rendirse?\n\n" +
@@ -728,6 +713,10 @@ public class PanelJuego extends JPanel {
             JOptionPane.WARNING_MESSAGE);
         
         if (confirmacion == JOptionPane.YES_OPTION) {
+            juegoTerminado = true;
+            
+            deshabilitarTableros();
+            
             String ganador = turnoJ1 ? jugador2.getUsername() : jugador1.getUsername();
             String perdedor = turnoJ1 ? jugador1.getUsername() : jugador2.getUsername();
             Player jugadorGanador = turnoJ1 ? jugador2 : jugador1;
@@ -746,6 +735,22 @@ public class PanelJuego extends JPanel {
             btnRendirse.setEnabled(false);
             btnVolverMenu.setEnabled(true);
             lblEstado.setText("JUEGO TERMINADO - RENDICIÓN");
+        }
+    }
+    
+    private void deshabilitarTableros() {
+        // Deshabilitar tablero J1
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                botonesTableroJ1[i][j].setEnabled(false);
+            }
+        }
+        
+        // Deshabilitar tablero J2
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                botonesTableroJ2[i][j].setEnabled(false);
+            }
         }
     }
     
